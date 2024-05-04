@@ -6,15 +6,20 @@ services:
             context: .
         ports:
             - "80:80"
+        env_file: 
+            - .env
         depends_on:
             - mongodb
         volumes:
             - ./app:/app
+            - static-data:/vol
     mongodb:
         image: mongo
         ports:
             - 27017:27017
         volumes:
-            - mongo_data:/data/db
+            - mongo-data:/data/db
+
 volumes:
-    mongo_data:
+    mongo-data:
+    static-data:
