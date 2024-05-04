@@ -28,6 +28,10 @@ async def read_item_by_id(id):
 
 @router.post("/items/", tags=["items"])
 async def create_item(item: ItemCreate):
+    label_id = int(item.label_id)
+    label_exists = db.labels.find_one({"_id": label_id})
+    if not label_exists:
+        return {"error": "Label with the given ID does not exist."}, 404
     item_id = db.items.insert_one(item.dict()).inserted_id
     item = db.items.find_one({"_id": item_id})
     return serialize_item(item)
