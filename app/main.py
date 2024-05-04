@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import user_router
+from routers import user_router, item_router
 
 description = """
 This API facilitates efficient management and categorization of office item images, leveraging advanced visual recognition technology. 👁️🤖
@@ -18,7 +18,19 @@ You have the ability to:
 
 """
 
+tags_metadata = [
+    {
+        "name": "users",
+        "description": "Operations with users.",
+    },
+    {
+        "name": "items",
+        "description": "Manage items.",
+    },
+]
+
 app = FastAPI(
+    openapi_tags=tags_metadata,
     title="OfficeItemsApp",
     description=description,
     version="0.0.1",
@@ -44,3 +56,4 @@ app.add_middleware(
 
 
 app.include_router(user_router.router)
+app.include_router(item_router.router)
