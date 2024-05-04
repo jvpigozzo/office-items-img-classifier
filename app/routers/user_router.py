@@ -1,5 +1,11 @@
 from fastapi import APIRouter, HTTPException
-from schemas import UserCreate, UserInDB, UserUpdate, serialize_users, serialize_user
+from schemas.user import (
+    UserCreate,
+    UserInDB,
+    UserUpdate,
+    serialize_users,
+    serialize_user,
+)
 from database import get_database
 from bson import ObjectId
 
@@ -9,20 +15,20 @@ router = APIRouter()
 db = get_database()
 
 
-@router.get("/users/")
+@router.get("/users/", tags=["users"])
 async def read_users():
     users = list(db.users.find())
     return serialize_users(users)
 
 
-@router.post("/users/", response_model=UserInDB)
+@router.post("/users/", response_model=UserInDB, tags=["users"])
 async def create_user(user: UserCreate):
     user_id = db.users.insert_one(user.dict()).inserted_id
     user = db.users.find_one({"_id": user_id})
     return serialize_user(user)
 
 
-@router.put("/users/{user_id}")
+@router.put("/users/{user_id}", tags=["users"])
 async def update_user(user_id: str, user: UserUpdate):
     user = dict(user)
     result = db.users.update_one({"_id": ObjectId(user_id)}, {"$set": user})
@@ -31,7 +37,7 @@ async def update_user(user_id: str, user: UserUpdate):
     return {"message": "User updated"}
 
 
-@router.delete("/users/{user_id}")
+@router.delete("/users/{user_id}", tags=["users"])
 async def delete_user(user_id: str):
     result = db.users.delete_one({"_id": ObjectId(user_id)})
     if result.deleted_count == 0:
