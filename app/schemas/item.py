@@ -1,10 +1,10 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class ItemSchema(BaseModel):
     name: str
-    label: str
-    # image_url: str
+    label_id: str
 
 
 class ItemCreate(ItemSchema):
