@@ -3,5 +3,6 @@ pydantic
 pymongo
 pytest 
 pytest-asyncio
+Pillow
 httpx
 uvicorn[standart]
