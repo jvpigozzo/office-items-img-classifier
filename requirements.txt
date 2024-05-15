@@ -5,4 +5,8 @@ pytest
 pytest-asyncio
 Pillow
 httpx
+requests
 uvicorn[standart]
+tiktoken==0.5.2
+langchain==0.1.9
+langchain-openai==0.0.7
