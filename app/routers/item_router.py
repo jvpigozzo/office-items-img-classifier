@@ -1,18 +1,17 @@
-import os
-from random import randint
 from bson import ObjectId
 from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import FileResponse
 from database import get_database
-from utils import save_img, rise_http_exception, get_response
+from utils import save_img, rise_http_exception, get_response, encode_image
 from services import item as service
 from schemas.item import ItemCreate, serialize_items, serialize_item
-
+from schemas.label import serialize_labels
+from classifier import model_pipeline
+from models import Label
+from prompts import PromptGenerator
 
 router = APIRouter()
 db = get_database()
-
-MEDIA_DIRECTORY = "/vol/media/"
 
 
 @router.get("/items/", tags=["items"])
@@ -54,6 +53,25 @@ async def show_item_img(id):
     item = await check_item(id)
     img_url = item["image_url"]
     return FileResponse(img_url)
+
+
+@router.post("/items/recognize/" + "{id}", tags=["items"])
+async def get_item_recognition(
+    id: str,
+    prompt_template: str,
+):
+    item = await check_item(id)
+    img_path = item["image_url"]
+    with open(img_path, mode="rb") as file:
+        content = file.read()
+    image_str = encode_image(content)
+    labels = serialize_labels(list(db.labels.find()))
+    labels = {item["id"]: item["name"] for item in labels}
+    prompt = PromptGenerator(
+        model_class=Label, template=prompt_template, labels=labels
+    ).prompt.text
+    classifier = model_pipeline(prompt=prompt, image_str=image_str)
+    return classifier
 
 
 async def check_item(id: ObjectId) -> dict:
