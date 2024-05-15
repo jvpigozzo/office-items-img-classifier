@@ -1,4 +1,5 @@
 import os
+import base64
 from PIL import Image
 from fastapi import status, HTTPException
 
@@ -28,3 +29,7 @@ def save_img(file, folder_name: str = "", file_name: str = None):
     img.thumbnail(output_size)
     img.save(img_path)
     return img_path
+
+
+def encode_image(content):
+    return base64.b64encode(content).decode("utf-8")
