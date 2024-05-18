@@ -1,8 +1,8 @@
 from bson import ObjectId
 from fastapi.responses import FileResponse
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, HTTPException
 
-from schemas.item import ItemCreate, serialize_items, serialize_item
+from schemas.item import ItemCreate, ItemUpdate, serialize_items, serialize_item
 
 from database import get_database
 from classifier import ModelPipeline
@@ -33,6 +33,15 @@ async def create_item(item: ItemCreate):
     item_id = db.items.insert_one(item.dict()).inserted_id
     item = db.items.find_one({"_id": item_id})
     return serialize_item(item)
+
+
+@router.put("/items/{item_id}", tags=["items"])
+async def update_item(item_id: str, item: ItemUpdate):
+    item = dict(item)
+    result = db.items.update_one({"_id": ObjectId(item_id)}, {"$set": item})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail=f"Item with ID {item_id} not found")
+    return {"message": "Item updated"}
 
 
 @router.post("/items/image-upload/" + "{id}", tags=["items"])
