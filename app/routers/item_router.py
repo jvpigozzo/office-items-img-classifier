@@ -37,8 +37,11 @@ async def create_item(item: ItemCreate):
 
 @router.put("/items/{item_id}", tags=["items"])
 async def update_item(item_id: str, item: ItemUpdate):
-    item = dict(item)
-    result = db.items.update_one({"_id": ObjectId(item_id)}, {"$set": item})
+    update_data = {k: v for k, v in item.dict().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+
+    result = db.items.update_one({"_id": ObjectId(item_id)}, {"$set": update_data})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail=f"Item with ID {item_id} not found")
     return {"message": "Item updated"}
@@ -63,14 +66,19 @@ async def show_item_img(id):
     return FileResponse(img_url)
 
 
-@router.post("/items/recognize/" + "{id}", tags=["items"])
-async def get_item_recognition(id: str, prompt_template: str, model_name: str):
-    item = await check_item(id)
+@router.post("/items/recognize/" + "{item_id}", tags=["items"])
+async def get_item_recognition(item_id: str, prompt_template: str, model_name: str):
+    item = await check_item(item_id)
     img_path = item["image_url"]
     classifier = ModelPipeline(
         prompt_template=prompt_template, img_path=img_path, model_name=model_name
     )
     img_class = classifier.process()
+    result = db.items.update_one({"_id": ObjectId(item_id)}, {"$set": img_class})
+    if result.matched_count == 0:
+        raise HTTPException(
+            status_code=404, detail=f"Could not update item with ID {item_id}"
+        )
     return img_class
 
 
