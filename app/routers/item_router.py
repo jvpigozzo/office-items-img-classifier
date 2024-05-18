@@ -19,9 +19,9 @@ async def read_items():
     return serialize_items(items)
 
 
-@router.get("/items/" + "{id}", tags=["items"])
-async def read_item_by_id(id):
-    return await check_item(id)
+@router.get("/items/" + "{item_id}", tags=["items"])
+async def read_item_by_id(item_id):
+    return await check_item(item_id)
 
 
 @router.post("/items/", tags=["items"])
@@ -47,11 +47,11 @@ async def update_item(item_id: str, item: ItemUpdate):
     return {"message": "Item updated"}
 
 
-@router.post("/items/image-upload/" + "{id}", tags=["items"])
-async def upload_item_img(id: str, image: UploadFile):
+@router.post("/items/image-upload/" + "{item_id}", tags=["items"])
+async def upload_item_img(item_id: str, image: UploadFile):
     image_name = image.filename
     image_url = save_img(file=image, file_name=image_name)
-    done = await service.push_img_url(id, image_url)
+    done = await service.push_img_url(item_id, image_url)
     return get_response(
         done,
         success_message="Image saved.",
@@ -59,9 +59,9 @@ async def upload_item_img(id: str, image: UploadFile):
     )
 
 
-@router.get("/items/image-show/" + "{id}", tags=["items"])
-async def show_item_img(id):
-    item = await check_item(id)
+@router.get("/items/image-show/" + "{item_id}", tags=["items"])
+async def show_item_img(item_id):
+    item = await check_item(item_id)
     img_url = item["image_url"]
     return FileResponse(img_url)
 
