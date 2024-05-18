@@ -69,7 +69,7 @@ POST /users - Register a new user into the App
 
 **GET ITEMS**
 ```markdown
-GET /users - Retrieve a list of all items.
+GET /items - Retrieve a list of all items.
 ```
 ```json
 [
