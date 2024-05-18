@@ -5,10 +5,17 @@ from typing import Optional
 class ItemSchema(BaseModel):
     name: str
     label_id: str
+    is_validated: bool
 
 
 class ItemCreate(ItemSchema):
     pass
+
+
+class ItemUpdate(ItemSchema):
+    name: Optional[str] = None
+    label_id: Optional[str] = None
+    is_validated: Optional[bool] = None
 
 
 def serialize_item(item):
