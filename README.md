@@ -23,7 +23,7 @@ This project is an API built using **Python, FastAPI, MongDB as the database.** 
 git clone https://github.com/jvpigozzo/office-items-img-classifier.git
 ```
 
-### Usage
+## Usage
 
 #### 2. Building and running the application with docker:
 
