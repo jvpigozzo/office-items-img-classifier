@@ -47,7 +47,7 @@ async def update_label(label_id: str, label: LabelUpdate):
 
 @router.delete("/labels/{label_id}", tags=["labels"])
 async def delete_label(label_id: str):
-    result = db.labels.delete_one({"_id": ObjectId(label_id)})
+    result = db.labels.delete_one({"_id": int(label_id)})
     if result.deleted_count == 0:
         raise HTTPException(
             status_code=404, detail=f"Label with ID {label_id} not found"

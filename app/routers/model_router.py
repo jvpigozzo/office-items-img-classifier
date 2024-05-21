@@ -47,7 +47,7 @@ async def update_model(model_id: str, model: ModelUpdate):
 
 @router.delete("/models/{model_id}", tags=["models"])
 async def delete_model(model_id: str):
-    result = db.models.delete_one({"_id": ObjectId(model_id)})
+    result = db.models.delete_one({"_id": int(model_id)})
     if result.deleted_count == 0:
         raise HTTPException(
             status_code=404, detail=f"model with ID {model_id} not found"
